@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NairobiWheelsAutoHubke</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>NairobiWheelsAutoHubKe</h1>
+    <div id="account">
+      <form id="signin-form">
+        <input id="name" placeholder="Your name" required>
+        <input id="phone" placeholder="Phone (07XXXXXXXX)" required>
+        <button>Sign in</button>
+      </form>
+      <p id="user-info" hidden></p>
+    </div>
+  </header>
+
+  <p id="message" role="status"></p>
+
+  <main>
+    <section class="filters">
+      <input id="search" type="search" placeholder="Search make, model or year">
+      <select id="category"></select>
+      <input id="max-price" type="number" min="0" placeholder="Max price (KES)">
+    </section>
+
+    <section id="cars" class="grid"></section>
+
+    <h2>My orders</h2>
+    <section id="orders"></section>
+  </main>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

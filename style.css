@@ -1,0 +1,94 @@
+:root {
+  --brand: #dbe1e8;
+  --text: #1c2833;
+  --muted: #6b7885;
+  --border: #dde3e9;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  color: var(--text);
+  background: #f5f7fa;
+}
+
+header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: var(--brand);
+  color: white;
+}
+header h1 { margin: 0; font-size: 1.4rem; }
+#signin-form { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+#user-info { margin: 0; }
+
+main { max-width: 1100px; margin: 0 auto; padding: 1.5rem; }
+
+input, select, button {
+  font: inherit;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+button {
+  background: var(--brand);
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+button:disabled { background: #b8c2cc; cursor: not-allowed; }
+
+.filters { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.5rem; }
+.filters input { flex: 1; min-width: 200px; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.photo { height: 140px; display: grid; place-items: center; font-size: 4rem; }
+.card .body { padding: 1rem; }
+.card h3 { margin: 0.5rem 0 0.25rem; }
+.card button { width: 100%; margin-top: 0.5rem; }
+
+.muted { color: var(--muted); font-size: 0.9rem; margin: 0.25rem 0; }
+.price { font-weight: 600; font-size: 1.1rem; margin: 0.5rem 0; }
+
+.badge {
+  font-size: 0.75rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  text-transform: capitalize;
+}
+.badge.available, .badge.paid { background: #d5f5e3; color: #1e8449; }
+.badge.reserved, .badge.pending { background: #fcf3cf; color: #9a7d0a; }
+.badge.sold, .badge.cancelled { background: #fadbd8; color: #922b21; }
+
+.order {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+}
+
+#message { margin: 0; padding: 0; text-align: center; font-weight: 500; }
+#message.show { padding: 0.75rem; background: #fef9e7; }
