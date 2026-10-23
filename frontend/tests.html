@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>NairobiWheelsAutoHubKe tests</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 700px; margin: 2rem auto; padding: 0 1rem; }
+    li { margin: 0.35rem 0; list-style: none; }
+    .pass::before { content: '✅ '; }
+    .fail::before { content: '❌ '; }
+    .fail { color: #922b21; }
+    #summary { font-weight: 600; font-size: 1.1rem; }
+  </style>
+</head>
+<body>
+  <h1>NairobiWheelsAutoHubKe tests</h1>
+  <p id="summary"></p>
+  <ul id="results"></ul>
+
+  <script type="module">
+    import { filterCars, placeOrder, payOrder, expireOrders } from './logic.js';
+
+    // A tiny test helper: run a function, show pass or fail.
+    let passed = 0, failed = 0;
+    function test(name, fn) {
+      const li = document.createElement('li');
+      try { fn(); li.className = 'pass'; li.textContent = name; passed++; }
+      catch (error) { li.className = 'fail'; li.textContent = `${name}: ${error.message}`; failed++; }
+      document.getElementById('results').append(li);
+    }
+    function expect(actual, expected) {
+      if (actual !== expected) throw new Error(`expected ${expected} but got ${actual}`);
+    }
+
+    // Fresh sample data for every test, so tests never affect each other.
+    const makeCars = () => [
+      { id: 1, make: 'Toyota', model: 'Corolla', year: 2023, category: 'Sedans', price: 3600000, status: 'available' },
+      { id: 2, make: 'Suzuki', model: 'Swift', year: 2021, category: 'Small Personal Cars', price: 1450000, status: 'available' },
+      { id: 3, make: 'Toyota', model: 'Prado', year: 2020, category: 'SUVs', price: 7800000, status: 'available' },
+    ];
+    const customer = { name: 'Amina', phone: '0712345678' };
+    const HOUR = 3600000;
+
+    // ---- Filtering ----
+    test('search finds cars by make', () => {
+      expect(filterCars(makeCars(), { search: 'toyota' }).length, 2);
+    });
+    test('search ignores capital letters and spaces around the text', () => {
+      expect(filterCars(makeCars(), { search: '  SWIFT ' }).length, 1);
+    });
+    test('category filter only returns that category', () => {
+      expect(filterCars(makeCars(), { category: 'SUVs' }).length, 1);
+    });
+    test('max price hides more expensive cars', () => {
+      expect(filterCars(makeCars(), { maxPrice: 4000000 }).length, 2);
+    });
+    test('no filters returns every car', () => {
+      expect(filterCars(makeCars()).length, 3);
+    });
+
+    // ---- Ordering ----
+    test('ordering an available car reserves it', () => {
+      const cars = makeCars(), orders = [];
+      const result = placeOrder(cars, orders, 1, customer);
+      expect(result.ok, true);
+      expect(cars[0].status, 'reserved');
+      expect(orders.length, 1);
+    });
+    test('the same car cannot be ordered twice (no double-selling)', () => {
+      const cars = makeCars(), orders = [];
+      placeOrder(cars, orders, 1, customer);
+      const second = placeOrder(cars, orders, 1, { name: 'Brian', phone: '0722222222' });
+      expect(second.ok, false);
+      expect(orders.length, 1);
+    });
+    test('ordering a car that does not exist fails safely', () => {
+      expect(placeOrder(makeCars(), [], 99, customer).ok, false);
+    });
+    test('deposit is 10% of the price', () => {
+      const result = placeOrder(makeCars(), [], 2, customer);
+      expect(result.order.deposit, 145000);
+    });
+
+    // ---- Payment and expiry ----
+    test('paying an order marks it paid and the car stays reserved', () => {
+      const cars = makeCars(), orders = [];
+      placeOrder(cars, orders, 1, customer);
+      expect(payOrder(orders, 1), true);
+      expect(orders[0].status, 'paid');
+      expect(cars[0].status, 'reserved');
+    });
+    test('an unpaid order older than 24 hours is cancelled and the car is freed', () => {
+      const cars = makeCars(), orders = [];
+      const start = Date.now();
+      placeOrder(cars, orders, 1, customer, start);
+      const released = expireOrders(cars, orders, start + 25 * HOUR);
+      expect(released, 1);
+      expect(orders[0].status, 'cancelled');
+      expect(cars[0].status, 'available');
+    });
+    test('an unpaid order is kept within 24 hours', () => {
+      const cars = makeCars(), orders = [];
+      const start = Date.now();
+      placeOrder(cars, orders, 1, customer, start);
+      expect(expireOrders(cars, orders, start + 23 * HOUR), 0);
+      expect(cars[0].status, 'reserved');
+    });
+    test('a paid order never expires', () => {
+      const cars = makeCars(), orders = [];
+      const start = Date.now();
+      placeOrder(cars, orders, 1, customer, start);
+      payOrder(orders, 1);
+      expect(expireOrders(cars, orders, start + 48 * HOUR), 0);
+      expect(cars[0].status, 'reserved');
+    });
+
+    document.getElementById('summary').textContent =
+      failed === 0 ? `All ${passed} tests passed` : `${failed} failed, ${passed} passed`;
+  </script>
+</body>
+</html>
