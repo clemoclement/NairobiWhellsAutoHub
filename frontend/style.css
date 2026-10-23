@@ -101,5 +101,37 @@ button:disabled { background: #b8c2cc; cursor: not-allowed; }
   display: block;
 }
 
+.filter-bar {
+  background: #2b2b2b;          /* match your header color */
+  padding: 20px 0;
+  width: 100%;
+}
+
+.filter-inner {
+  max-width: 1100px;            /* same width as your car grid */
+  margin: 0 auto;
+  padding: 0 16px;
+  display: flex;
+  gap: 12px;
+}
+
+.filter-inner input,
+.filter-inner select {
+  padding: 14px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: #fff;
+}
+
+.filter-inner input[type="search"] { flex: 2; }
+.filter-inner select,
+.filter-inner input[type="number"] { flex: 1; }
+
+/* stack on phones */
+@media (max-width: 700px) {
+  .filter-inner { flex-direction: column; }
+}
+
 #message { margin: 0; padding: 0; text-align: center; font-weight: 500; }
 #message.show { padding: 0.75rem; background: #fef9e7; }
