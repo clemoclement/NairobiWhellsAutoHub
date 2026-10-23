@@ -2,7 +2,7 @@ import { SEED_CARS } from './data.js';
 import { filterCars, placeOrder, payOrder, expireOrders, formatPrice } from './logic.js';
 
 // ---- Saved data (stays in your browser until you clear it) ----
-const KEY = 'autohub-v1';
+const KEY = 'autohub-v2';
 
 function load() {
   try {
