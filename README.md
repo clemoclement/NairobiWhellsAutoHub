@@ -1,2 +1,2 @@
-# NairobiWhellsAutoHub
+# NairobiWheelsAutoHub
 Car Sales Management System
