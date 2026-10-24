@@ -144,9 +144,20 @@ $('#order-list').addEventListener('click', (event) => {
 });
 
 // If you changed something on the customer page, refresh the data when you return here.
-window.addEventListener('focus', () => {
+// window.addEventListener('focus', () => {
+//   Object.assign(state, loadState());
+//   renderAll();
+// });
+
+
+function refreshFromStorage() {
   Object.assign(state, loadState());
   renderAll();
+}
+window.addEventListener('focus', refreshFromStorage);
+window.addEventListener('storage', refreshFromStorage);   // fires when another tab saves data
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) refreshFromStorage();
 });
 
 // ---- Start ----
