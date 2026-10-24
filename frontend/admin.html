@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NairobiWheelsAutoHub</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>NairobiWheelsAutoHub Admin</h1>
+    <nav><a href="index.html" style="color:white">Customer site</a></nav>
+  </header>
+
+  <p id="message" role="status"></p>
+
+  <main>
+    <section id="login">
+      <h2>Admin login</h2>
+      <form id="login-form" class="row">
+        <input id="pin" type="password" placeholder="Admin PIN" required>
+        <button>Log in</button>
+      </form>
+      <p class="muted">Demo PIN: 1234. This is for learning only. Real security comes with the backend.</p>
+    </section>
+
+    <div id="dashboard" hidden>
+      <button id="logout">Log out</button>
+
+      <h2>Sales report</h2>
+      <section id="report" class="stats"></section>
+
+      <h2>Add a car</h2>
+      <form id="car-form" class="row">
+        <input id="make" placeholder="Make" required>
+        <input id="model" placeholder="Model" required>
+        <input id="year" type="number" placeholder="Year" required>
+        <select id="category"></select>
+        <select id="condition"><option>Used</option><option>New</option></select>
+        <input id="price" type="number" min="1" placeholder="Price (KES)" required>
+        <input id="specs" placeholder="Specs (optional)">
+        <button>Add car</button>
+      </form>
+
+      <h2>Cars</h2>
+      <section id="car-list"></section>
+
+      <h2>Orders</h2>
+      <section id="order-list"></section>
+    </div>
+  </main>
+
+  <script type="module" src="admin.js"></script>
+</body>
+</html>

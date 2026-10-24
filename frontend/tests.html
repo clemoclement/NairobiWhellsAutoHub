@@ -18,7 +18,8 @@
   <ul id="results"></ul>
 
   <script type="module">
-    import { filterCars, placeOrder, payOrder, expireOrders } from './logic.js';
+    import { filterCars, placeOrder, payOrder, expireOrders,
+      addCar, deleteCar, setCarStatus, setOrderStatus, salesReport, escapeHtml, } from './logic.js';
 
     // A tiny test helper: run a function, show pass or fail.
     let passed = 0, failed = 0;
@@ -112,6 +113,95 @@
       payOrder(orders, 1);
       expect(expireOrders(cars, orders, start + 48 * HOUR), 0);
       expect(cars[0].status, 'reserved');
+    });
+
+
+     // ---- Admin: adding and deleting cars ----
+    const goodCar = { make: 'Honda', model: 'Fit', year: 2020, category: 'Small Personal Cars', price: 1200000 };
+    test('admin can add a car and it starts as available', () => {
+      const cars = makeCars();
+      const result = addCar(cars, goodCar);
+      expect(result.ok, true);
+      expect(cars.length, 4);
+      expect(result.car.status, 'available');
+      expect(result.car.id, 4);
+    });
+    test('adding a car with no make is rejected', () => {
+      const cars = makeCars();
+      expect(addCar(cars, { ...goodCar, make: '  ' }).ok, false);
+      expect(cars.length, 3);
+    });
+    test('adding a car with a zero price is rejected', () => {
+      expect(addCar(makeCars(), { ...goodCar, price: 0 }).ok, false);
+    });
+    test('a car with an open order cannot be deleted', () => {
+      const cars = makeCars(), orders = [];
+      placeOrder(cars, orders, 1, customer);
+      expect(deleteCar(cars, orders, 1).ok, false);
+      expect(cars.length, 3);
+    });
+    test('a car with no orders can be deleted', () => {
+      const cars = makeCars();
+      expect(deleteCar(cars, [], 2).ok, true);
+      expect(cars.length, 2);
+    });
+    test('admin cannot change the status of a car with an open order', () => {
+      const cars = makeCars(), orders = [];
+      placeOrder(cars, orders, 1, customer);
+      expect(setCarStatus(cars, orders, 1, 'available').ok, false);
+      expect(cars[0].status, 'reserved');
+    });
+
+    // ---- Admin: order status flow ----
+    test('completing a paid order marks the car sold', () => {
+      const cars = makeCars(), orders = [];
+      placeOrder(cars, orders, 1, customer);
+      payOrder(orders, 1);
+      expect(setOrderStatus(cars, orders, 1, 'completed').ok, true);
+      expect(cars[0].status, 'sold');
+    });
+    test('an unpaid order cannot be completed', () => {
+      const cars = makeCars(), orders = [];
+      placeOrder(cars, orders, 1, customer);
+      expect(setOrderStatus(cars, orders, 1, 'completed').ok, false);
+      expect(cars[0].status, 'reserved');
+    });
+    test('cancelling an order frees the car', () => {
+      const cars = makeCars(), orders = [];
+      placeOrder(cars, orders, 1, customer);
+      setOrderStatus(cars, orders, 1, 'cancelled');
+      expect(cars[0].status, 'available');
+    });
+    test('a cancelled order cannot be cancelled again', () => {
+      const cars = makeCars(), orders = [];
+      placeOrder(cars, orders, 1, customer);
+      setOrderStatus(cars, orders, 1, 'cancelled');
+      expect(setOrderStatus(cars, orders, 1, 'cancelled').ok, false);
+    });
+    test('a confirmed order can still be paid', () => {
+      const cars = makeCars(), orders = [];
+      placeOrder(cars, orders, 1, customer);
+      setOrderStatus(cars, orders, 1, 'confirmed');
+      expect(payOrder(orders, 1), true);
+    });
+
+    // ---- Admin: report and safety ----
+    test('sales report counts only completed orders', () => {
+      const cars = makeCars(), orders = [];
+      placeOrder(cars, orders, 1, customer);   // Sedan, completed below
+      placeOrder(cars, orders, 2, customer);   // left pending
+      payOrder(orders, 1);
+      setOrderStatus(cars, orders, 1, 'completed');
+      const report = salesReport(cars, orders);
+      expect(report.carsSold, 1);
+      expect(report.revenue, 3600000);
+      expect(report.bestCategory, 'Sedans');
+    });
+    test('sales report with no sales has no best category', () => {
+      expect(salesReport(makeCars(), []).bestCategory, null);
+    });
+    test('escapeHtml turns tags into harmless text', () => {
+      expect(escapeHtml('<b>hi</b>'), '&lt;b&gt;hi&lt;/b&gt;');
     });
 
     document.getElementById('summary').textContent =
