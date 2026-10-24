@@ -3,18 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>NairobiWheelsAutoHubke</title>
-  <link rel="stylesheet" href="style.css">
+  <title>AutoHub Cars</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header>
-    <h1>NairobiWheelsAutoHubKe</h1>
+    <h1>AutoHub Cars</h1>
     <div id="account">
-      <form id="signin-form">
-        <input id="name" placeholder="Your Name" required>
-        <input id="phone" placeholder="Phone (07XXXXXXXX)" required>
-        <button>Sign in</button>
+      <form id="login-form" class="auth">
+        <input id="login-email" type="email" placeholder="Email" autocomplete="username" required>
+        <input id="login-password" type="password" placeholder="Password" autocomplete="current-password" required>
+        <button>Log in</button>
+        <button type="button" id="show-register" class="link">Create account</button>
       </form>
+
+      <form id="register-form" class="auth" hidden>
+        <input id="reg-name" placeholder="Full name" autocomplete="name" required>
+        <input id="reg-email" type="email" placeholder="Email" autocomplete="email" required>
+        <input id="reg-phone" placeholder="Phone (07XXXXXXXX)" autocomplete="tel" required>
+        <input id="reg-password" type="password" placeholder="Password (8+ characters)" minlength="8" autocomplete="new-password" required>
+        <button>Sign up</button>
+        <button type="button" id="show-login" class="link">I have an account</button>
+      </form>
+
       <p id="user-info" hidden></p>
     </div>
   </header>
@@ -25,6 +36,7 @@
     <section class="filters">
       <input id="search" type="search" placeholder="Search make, model or year">
       <select id="category"></select>
+      <input id="year" type="number" min="1990" placeholder="Year">
       <input id="max-price" type="number" min="0" placeholder="Max price (KES)">
     </section>
 
@@ -33,6 +45,8 @@
     <h2>My orders</h2>
     <section id="orders"></section>
   </main>
+
+  <footer>Dealership staff: <a href="admin.html">admin login</a></footer>
 
   <script type="module" src="app.js"></script>
 </body>

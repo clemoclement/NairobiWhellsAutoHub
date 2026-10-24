@@ -1,6 +1,8 @@
 """AutoHub backend: login and cars.  Run with:  flask --app app run --debug"""
+import hmac
 import os
 import re
+import secrets
 import sqlite3
 from datetime import date
 from functools import wraps
@@ -10,7 +12,10 @@ from flask import Flask, jsonify, request, send_from_directory, session
 from werkzeug.security import check_password_hash
 
 import db
+import services
 from db import get_db
+from mpesa import MpesaClient
+from services import ServiceError, normalize_phone
 
 BASE = Path(__file__).parent
 
@@ -24,9 +29,17 @@ def create_app(test_config=None):
         DATABASE=str(BASE / "autohub.db"),
         SESSION_COOKIE_HTTPONLY=True,   # JavaScript cannot read the cookie
         SESSION_COOKIE_SAMESITE="Lax",  # other sites cannot send it along with requests
+        MPESA_MODE=os.environ.get("MPESA_MODE", "mock"),  # mock, sandbox or production
+        MPESA_CONSUMER_KEY=os.environ.get("MPESA_CONSUMER_KEY", ""),
+        MPESA_CONSUMER_SECRET=os.environ.get("MPESA_CONSUMER_SECRET", ""),
+        MPESA_SHORTCODE=os.environ.get("MPESA_SHORTCODE", ""),
+        MPESA_PASSKEY=os.environ.get("MPESA_PASSKEY", ""),
+        MPESA_PUBLIC_URL=os.environ.get("MPESA_PUBLIC_URL", ""),  # e.g. your ngrok https address
+        MPESA_CALLBACK_SECRET=os.environ.get("MPESA_CALLBACK_SECRET", "dev-callback-secret"),
     )
     if test_config:
         app.config.update(test_config)
+    app.mpesa = MpesaClient(app.config)
 
     db.init_app(app)
     with app.app_context():
@@ -64,13 +77,6 @@ def create_app(test_config=None):
     def user_json(user):
         return {"id": user["id"], "name": user["name"], "email": user["email"],
                 "phone": user["phone"], "role": user["role"]}
-
-    def normalize_phone(raw):
-        """Turn 0712345678 or 254712345678 into 254712345678 (the format M-Pesa needs)."""
-        digits = re.sub(r"[\s+-]", "", str(raw or ""))
-        if re.fullmatch(r"0[71]\d{8}", digits):
-            digits = "254" + digits[1:]
-        return digits if re.fullmatch(r"254[71]\d{8}", digits) else None
 
     CAR_SELECT = """SELECT cars.id, cars.make, cars.model, cars.year, cars.price,
                            cars.condition, cars.specs, cars.status, categories.name AS category
@@ -181,6 +187,7 @@ def create_app(test_config=None):
 
     @app.get("/api/cars")
     def list_cars():
+        services.release_expired(get_db())  # free cars whose reservation ran out
         # Build the WHERE part from whichever filters were sent.
         # The ? marks keep user input out of the SQL text (this blocks SQL injection).
         where, params = [], []
@@ -208,6 +215,7 @@ def create_app(test_config=None):
 
     @app.get("/api/cars/<int:car_id>")
     def car_detail(car_id):
+        services.release_expired(get_db())
         car = get_car(car_id)
         return jsonify(dict(car)) if car else error("Car not found.", 404)
 
@@ -232,6 +240,8 @@ def create_app(test_config=None):
         values, problem = clean_car(request.get_json(silent=True) or {}, partial=True)
         if problem:
             return error(problem, 400)
+        if "status" in values and services.has_active_order(get_db(), car_id):
+            return error("This car has an open order. Update the order instead.", 409)
         if values:
             database = get_db()
             changes = ", ".join(f"{column} = ?" for column in values)
@@ -242,13 +252,112 @@ def create_app(test_config=None):
     @app.delete("/api/cars/<int:car_id>")
     @admin_required
     def delete_car(car_id):
-        # In the next step this will refuse to delete cars that have open orders.
         if get_car(car_id) is None:
             return error("Car not found.", 404)
+        if get_db().execute("SELECT 1 FROM orders WHERE car_id = ?", (car_id,)).fetchone():
+            return error("This car has order history, so it can't be deleted. Mark it Sold instead.", 409)
         database = get_db()
         database.execute("DELETE FROM cars WHERE id = ?", (car_id,))
         database.commit()
         return jsonify({"ok": True})
+
+    # -------------------------------------------------------------- orders
+    @app.errorhandler(ServiceError)
+    def handle_service_error(problem):
+        return error(problem.message, problem.status)
+
+    def order_json(order_id, user):
+        return services.order_rows(get_db(), order_id=order_id, admin=user["role"] == "admin")[0]
+
+    @app.get("/api/config")
+    def config():
+        return jsonify({"mpesa_mode": app.mpesa.mode})
+
+    @app.post("/api/orders")
+    @login_required
+    def create_order():
+        car_id = (request.get_json(silent=True) or {}).get("car_id")
+        if not isinstance(car_id, int) or isinstance(car_id, bool):
+            return error("car_id is required.", 400)
+        user = current_user()
+        order_id = services.place_order(get_db(), user["id"], car_id)
+        return jsonify(order_json(order_id, user)), 201
+
+    @app.get("/api/orders")
+    @login_required
+    def my_orders():
+        services.release_expired(get_db())
+        return jsonify(services.order_rows(get_db(), user_id=current_user()["id"]))
+
+    @app.post("/api/orders/<int:order_id>/cancel")
+    @login_required
+    def cancel_order(order_id):
+        user = current_user()
+        services.cancel_order(get_db(), order_id, user)
+        return jsonify(order_json(order_id, user))
+
+    @app.post("/api/orders/<int:order_id>/pay")
+    @login_required
+    def pay_order(order_id):
+        phone = (request.get_json(silent=True) or {}).get("phone")
+        result = services.start_payment(get_db(), app.mpesa, current_user(), order_id, phone)
+        body = {"message": "Check your phone and enter your M-Pesa PIN."}
+        if app.mpesa.is_mock:
+            body["checkout_request_id"] = result["checkout_request_id"]
+        return jsonify(body), 202
+
+    # ------------------------------------------------------------- M-Pesa
+    @app.post("/api/mpesa/callback/<token>")
+    def mpesa_callback(token):
+        # Safaricom does not sign its messages, so the address itself carries a secret.
+        if not hmac.compare_digest(token, app.config["MPESA_CALLBACK_SECRET"]):
+            return error("Not found.", 404)
+        services.process_callback(get_db(), request.get_json(silent=True) or {})
+        return jsonify({"ResultCode": 0, "ResultDesc": "Accepted"})
+
+    @app.post("/api/dev/mpesa/simulate")
+    @login_required
+    def simulate_mpesa():
+        """Mock mode only: pretend to be Safaricom, so you can test without a real phone."""
+        if not app.mpesa.is_mock:
+            return error("Not found.", 404)
+        data = request.get_json(silent=True) or {}
+        user = current_user()
+        payment = get_db().execute(
+            "SELECT p.*, o.user_id FROM payments p JOIN orders o ON o.id = p.order_id "
+            "WHERE p.checkout_request_id = ?", (data.get("checkout_request_id"),)).fetchone()
+        if payment is None or (payment["user_id"] != user["id"] and user["role"] != "admin"):
+            return error("Payment not found.", 404)
+        callback = {"CheckoutRequestID": payment["checkout_request_id"]}
+        if data.get("outcome") == "success":
+            callback.update(ResultCode=0, ResultDesc="The service request is processed successfully.",
+                            CallbackMetadata={"Item": [
+                                {"Name": "Amount", "Value": payment["amount"]},
+                                {"Name": "MpesaReceiptNumber", "Value": "MOCK" + secrets.token_hex(3).upper()},
+                                {"Name": "PhoneNumber", "Value": int(payment["phone"])}]})
+        else:
+            callback.update(ResultCode=1032, ResultDesc="Request cancelled by user")
+        services.process_callback(get_db(), {"Body": {"stkCallback": callback}})
+        return jsonify({"ok": True})
+
+    # -------------------------------------------------------- admin: orders
+    @app.get("/api/admin/orders")
+    @admin_required
+    def admin_orders():
+        services.release_expired(get_db())
+        return jsonify(services.order_rows(get_db(), admin=True))
+
+    @app.post("/api/admin/orders/<int:order_id>/status")
+    @admin_required
+    def admin_order_status(order_id):
+        status = (request.get_json(silent=True) or {}).get("status")
+        services.admin_set_status(get_db(), order_id, status, current_user())
+        return jsonify(order_json(order_id, current_user()))
+
+    @app.get("/api/admin/report")
+    @admin_required
+    def admin_report():
+        return jsonify(services.sales_report(get_db()))
 
     return app
 

@@ -1,15 +1,7 @@
-import { loadState, saveState } from './storage.js';
-import {
-  CATEGORIES, addCar, deleteCar, setCarStatus, setOrderStatus,
-  salesReport, formatPrice, escapeHtml,
-} from './logic.js';
+import { api } from './api.js';
+import { formatPrice, escapeHtml } from './util.js';
 
-// DEMO ONLY: anyone can read this PIN in the browser.
-// Real login must be checked by the backend.
-const ADMIN_PIN = '1234';
-
-const state = loadState();
-const save = () => saveState(state);
+const state = { user: null, cars: [], orders: [], report: null };
 const $ = (selector) => document.querySelector(selector);
 const carName = (car) => escapeHtml(`${car.year} ${car.make} ${car.model}`);
 
@@ -17,19 +9,35 @@ function showMessage(text) {
   const box = $('#message');
   box.textContent = text;
   box.classList.add('show');
-  setTimeout(() => { box.textContent = ''; box.classList.remove('show'); }, 4000);
+  clearTimeout(showMessage.timer);
+  showMessage.timer = setTimeout(() => { box.textContent = ''; box.classList.remove('show'); }, 6000);
+}
+
+// ---- Getting data from the server ----
+async function loadAll() {
+  if (!state.user) return;
+  try {
+    [state.report, state.cars, state.orders] = await Promise.all([
+      api('/admin/report'), api('/cars'), api('/admin/orders'),
+    ]);
+    renderAll();
+  } catch (error) {
+    showMessage(error.message);
+    if (error.status === 401 || error.status === 403) { state.user = null; renderAll(); }
+  }
 }
 
 // ---- Drawing the page ----
 function renderReport() {
-  const r = salesReport(state.cars, state.orders);
-  const available = state.cars.filter((c) => c.status === 'available').length;
+  const r = state.report;
   const stat = (label, value) => `<div class="stat"><span>${label}</span><strong>${value}</strong></div>`;
   $('#report').innerHTML =
-    stat('Cars sold', r.carsSold) +
+    stat('Cars sold', r.cars_sold) +
     stat('Revenue', formatPrice(r.revenue)) +
-    stat('Best category', escapeHtml(r.bestCategory ?? 'None yet')) +
-    stat('Cars available', available);
+    stat('Best category', escapeHtml(r.best_category ?? 'None yet')) +
+    stat('Cars available', r.cars_available) +
+    stat('Deposits collected', formatPrice(r.deposits_collected)) +
+    (r.refunds_needed ? stat('Refunds needed', r.refunds_needed) : '');
 }
 
 function renderCars() {
@@ -48,118 +56,138 @@ function renderCars() {
 }
 
 function orderButtons(order) {
-  const btn = (action, label) => `<button data-order="${order.id}" data-action="${action}">${label}</button>`;
-  if (order.status === 'pending') return btn('confirmed', 'Confirm') + btn('cancelled', 'Cancel');
-  if (order.status === 'confirmed') return btn('cancelled', 'Cancel');
-  if (order.status === 'paid') return btn('completed', 'Mark completed') + btn('cancelled', 'Cancel');
+  const button = (action, label) =>
+    `<button data-order="${order.id}" data-action="${action}">${label}</button>`;
+  if (order.status === 'pending') return button('confirmed', 'Confirm') + button('cancelled', 'Cancel');
+  if (order.status === 'confirmed') return button('cancelled', 'Cancel');
+  if (order.status === 'paid') return button('completed', 'Mark completed') + button('cancelled', 'Cancel');
   return '';
 }
 
 function renderOrders() {
-  $('#order-list').innerHTML = state.orders.map((order) => {
-    const car = state.cars.find((c) => c.id === order.carId);
-    return `
-      <div class="order">
-        <div>
-          <strong>${car ? carName(car) : 'Deleted car'}</strong>
-          <p class="muted">${escapeHtml(order.customer.name)} · ${escapeHtml(order.customer.phone)}
-            · deposit ${formatPrice(order.deposit)}</p>
-        </div>
+  $('#order-list').innerHTML = state.orders.map((order) => `
+    <div class="order">
+      <div>
+        <strong>${carName(order.car)}</strong>
+        <p class="muted">${escapeHtml(order.customer_name)} · ${escapeHtml(order.customer_phone)}
+          · deposit ${formatPrice(order.deposit)}
+          ${order.receipt ? `· receipt ${escapeHtml(order.receipt)}` : ''}</p>
+      </div>
+      <span>
         <span class="badge ${order.status}">${order.status}</span>
-        <div>${orderButtons(order)}</div>
-      </div>`;
-  }).join('') || '<p class="muted">No orders yet.</p>';
+        ${order.refund_needed ? '<span class="badge refund">refund needed</span>' : ''}
+      </span>
+      <div>${orderButtons(order)}</div>
+    </div>`).join('') || '<p class="muted">No orders yet.</p>';
 }
 
 function renderAll() {
-  const loggedIn = sessionStorage.getItem('admin') === 'yes';
+  const loggedIn = Boolean(state.user);
   $('#login').hidden = loggedIn;
   $('#dashboard').hidden = !loggedIn;
   if (!loggedIn) return;
+  $('#who').textContent = `Logged in as ${state.user.name}.`;
   renderReport();
-  renderCars();
   renderOrders();
+  renderCars();
 }
 
-// ---- Reacting to the admin ----
-$('#login-form').addEventListener('submit', (event) => {
+// ---- Logging in ----
+async function login(event) {
   event.preventDefault();
-  if ($('#pin').value === ADMIN_PIN) {
-    sessionStorage.setItem('admin', 'yes');
-    $('#pin').value = '';
-    renderAll();
-  } else {
-    showMessage('Wrong PIN.');
+  try {
+    const user = await api('/login', {
+      method: 'POST', body: { email: $('#email').value, password: $('#password').value },
+    });
+    if (user.role !== 'admin') {
+      // Stay logged in as a customer, but show no admin tools. The server refuses
+      // every admin request from a customer anyway.
+      return showMessage('That account is not an admin account.');
+    }
+    state.user = user;
+    $('#login-form').reset();
+    await loadAll();
+  } catch (error) {
+    showMessage(error.message);
   }
-});
-
-$('#logout').addEventListener('click', () => {
-  sessionStorage.removeItem('admin');
-  renderAll();
-});
-
-$('#car-form').addEventListener('submit', (event) => {
-  event.preventDefault();
-  const result = addCar(state.cars, {
-    make: $('#make').value,
-    model: $('#model').value,
-    year: Number($('#year').value),
-    category: $('#category').value,
-    condition: $('#condition').value,
-    price: Number($('#price').value),
-    specs: $('#specs').value,
-  });
-  if (!result.ok) return showMessage(result.error);
-  save();
-  event.target.reset();
-  showMessage('Car added.');
-  renderAll();
-});
-
-$('#car-list').addEventListener('change', (event) => {
-  const id = Number(event.target.dataset.status);
-  if (!id) return;
-  const result = setCarStatus(state.cars, state.orders, id, event.target.value);
-  if (!result.ok) showMessage(result.error);
-  save();
-  renderAll();
-});
-
-$('#car-list').addEventListener('click', (event) => {
-  const id = Number(event.target.dataset.delete);
-  if (!id || !confirm('Delete this car?')) return;
-  const result = deleteCar(state.cars, state.orders, id);
-  showMessage(result.ok ? 'Car deleted.' : result.error);
-  save();
-  renderAll();
-});
-
-$('#order-list').addEventListener('click', (event) => {
-  const id = Number(event.target.dataset.order);
-  if (!id) return;
-  const result = setOrderStatus(state.cars, state.orders, id, event.target.dataset.action);
-  if (!result.ok) showMessage(result.error);
-  save();
-  renderAll();
-});
-
-// If you changed something on the customer page, refresh the data when you return here.
-// window.addEventListener('focus', () => {
-//   Object.assign(state, loadState());
-//   renderAll();
-// });
-
-
-function refreshFromStorage() {
-  Object.assign(state, loadState());
-  renderAll();
 }
-window.addEventListener('focus', refreshFromStorage);
-window.addEventListener('storage', refreshFromStorage);   // fires when another tab saves data
-document.addEventListener('visibilitychange', () => {
-  if (!document.hidden) refreshFromStorage();
+$('#login-form').addEventListener('submit', login);
+
+$('#logout').addEventListener('click', async () => {
+  await api('/logout', { method: 'POST' });
+  state.user = null;
+  renderAll();
+});
+
+// ---- Managing cars ----
+$('#car-form').addEventListener('submit', async (event) => {
+  event.preventDefault();
+  try {
+    await api('/cars', {
+      method: 'POST',
+      body: {
+        make: $('#make').value, model: $('#model').value,
+        year: Number($('#year').value), category: $('#category').value,
+        condition: $('#condition').value, price: Number($('#price').value),
+        specs: $('#specs').value,
+      },
+    });
+    event.target.reset();
+    showMessage('Car added.');
+  } catch (error) {
+    showMessage(error.message);
+  }
+  await loadAll();
+});
+
+$('#car-list').addEventListener('change', async (event) => {
+  const id = event.target.dataset.status;
+  if (!id) return;
+  try {
+    await api(`/cars/${id}`, { method: 'PUT', body: { status: event.target.value } });
+  } catch (error) {
+    showMessage(error.message);
+  }
+  await loadAll();
+});
+
+$('#car-list').addEventListener('click', async (event) => {
+  const id = event.target.dataset.delete;
+  if (!id || !confirm('Delete this car?')) return;
+  try {
+    await api(`/cars/${id}`, { method: 'DELETE' });
+    showMessage('Car deleted.');
+  } catch (error) {
+    showMessage(error.message);
+  }
+  await loadAll();
+});
+
+// ---- Managing orders ----
+$('#order-list').addEventListener('click', async (event) => {
+  const { order, action } = event.target.dataset;
+  if (!order) return;
+  try {
+    await api(`/admin/orders/${order}/status`, { method: 'POST', body: { status: action } });
+  } catch (error) {
+    showMessage(error.message);
+  }
+  await loadAll();
 });
 
 // ---- Start ----
-$('#category').innerHTML = CATEGORIES.map((c) => `<option>${c}</option>`).join('');
-renderAll();
+async function start() {
+  try {
+    const categories = await api('/categories');
+    $('#category').innerHTML = categories.map((c) => `<option>${escapeHtml(c)}</option>`).join('');
+    const me = await api('/me').catch(() => null); // not logged in is fine
+    if (me && me.role === 'admin') state.user = me;
+  } catch (error) {
+    showMessage(error.message);
+  }
+  renderAll();
+  await loadAll();
+  setInterval(loadAll, 15000);               // new orders appear without refreshing
+  window.addEventListener('focus', loadAll); // and when you switch back to this tab
+}
+start();

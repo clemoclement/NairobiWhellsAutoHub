@@ -1,5 +1,6 @@
 """Database helpers. We use SQLite (a database stored in one file) and plain SQL."""
 import sqlite3
+from contextlib import contextmanager
 
 import click
 from flask import current_app, g
@@ -37,6 +38,39 @@ CREATE TABLE IF NOT EXISTS cars (
                 CHECK (status IN ('available', 'reserved', 'sold')),
     created_at  TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS orders (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id    INTEGER NOT NULL REFERENCES users(id),
+    car_id     INTEGER NOT NULL REFERENCES cars(id),
+    status     TEXT NOT NULL DEFAULT 'pending'
+               CHECK (status IN ('pending', 'confirmed', 'paid', 'completed', 'cancelled')),
+    deposit    INTEGER NOT NULL,
+    created_at INTEGER NOT NULL,   -- times are stored as Unix seconds
+    expires_at INTEGER NOT NULL
+);
+
+-- Safety net against double-selling: the database itself refuses a second
+-- active order for the same car, even if our code had a bug.
+CREATE UNIQUE INDEX IF NOT EXISTS one_active_order_per_car
+    ON orders(car_id) WHERE status IN ('pending', 'confirmed', 'paid');
+
+CREATE TABLE IF NOT EXISTS payments (
+    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_id            INTEGER NOT NULL REFERENCES orders(id),
+    amount              INTEGER NOT NULL,
+    phone               TEXT NOT NULL,
+    checkout_request_id TEXT NOT NULL UNIQUE,
+    mpesa_receipt       TEXT NOT NULL DEFAULT '',
+    status              TEXT NOT NULL DEFAULT 'initiated'
+                        CHECK (status IN ('initiated', 'success', 'failed')),
+    result_desc         TEXT NOT NULL DEFAULT '',
+    needs_refund        INTEGER NOT NULL DEFAULT 0,
+    created_at          INTEGER NOT NULL
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS unique_receipt
+    ON payments(mpesa_receipt) WHERE mpesa_receipt <> '';
 """
 
 # (make, model, year, category, condition, price, specs)
@@ -55,10 +89,28 @@ SAMPLE_CARS = [
 def get_db():
     """Open one database connection per request and reuse it."""
     if "db" not in g:
-        g.db = sqlite3.connect(current_app.config["DATABASE"])
+        # isolation_level=None: we start and end transactions ourselves (see transaction()).
+        g.db = sqlite3.connect(current_app.config["DATABASE"], timeout=10, isolation_level=None)
         g.db.row_factory = sqlite3.Row  # lets us read columns by name
         g.db.execute("PRAGMA foreign_keys = ON")
     return g.db
+
+
+@contextmanager
+def transaction(database):
+    """Run several statements as one all-or-nothing unit.
+
+    BEGIN IMMEDIATE locks the database for writing straight away. If two people try
+    to order the same car at the same moment, the second one waits until the first
+    has finished, and then sees that the car is already reserved.
+    """
+    database.execute("BEGIN IMMEDIATE")
+    try:
+        yield
+        database.execute("COMMIT")
+    except BaseException:
+        database.execute("ROLLBACK")
+        raise
 
 
 def close_db(error=None):
@@ -111,7 +163,15 @@ def create_admin_command(email, name, phone, password):
     click.echo(f"Admin {email} created.")
 
 
+@click.command("expire-orders")
+def expire_orders_command():
+    """Cancel unpaid orders that ran out of time (optional: schedule this with cron)."""
+    import services
+    click.echo(f"Released {services.release_expired(get_db())} car(s).")
+
+
 def init_app(app):
     app.teardown_appcontext(close_db)
     app.cli.add_command(init_db_command)
     app.cli.add_command(create_admin_command)
+    app.cli.add_command(expire_orders_command)
