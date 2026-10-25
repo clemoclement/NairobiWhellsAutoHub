@@ -121,3 +121,54 @@ button:disabled { background: #b8c2cc; cursor: not-allowed; }
 .mock-box button { margin-left: 0.25rem; }
 .badge.refund { background: #fadbd8; color: #922b21; }
 footer { text-align: center; color: var(--muted); padding: 1.5rem; font-size: 0.9rem; }
+
+
+
+[hidden] { display: none !important; }
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#account { position: relative; }
+
+#account-toggle {
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 8px;
+  background: #fff;
+  color: #0b5cab;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  width: 300px;
+  padding: 16px;
+  background: #fff;
+  color: #222;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  z-index: 100;
+}
+
+.auth {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.auth input { width: 100%; box-sizing: border-box; }
+
+.auth .link {
+  background: none;
+  border: 0;
+  color: #0b5cab;
+  text-decoration: underline;
+  cursor: pointer;
+}
