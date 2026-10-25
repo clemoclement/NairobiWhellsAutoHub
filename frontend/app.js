@@ -53,12 +53,27 @@ async function loadOrders() {
 
 const reloadAll = () => Promise.all([loadCars(), loadOrders()]);
 
+
+function carSlug(car) {
+  return `${car.make}-${car.model}`
+    .toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+
+
 // ---- Drawing the page ----
 function carCard(car) {
   const available = car.status === 'available';
   return `
     <article class="card">
-      <div class="photo" style="background:#e8eef5">🚗</div>
+      <div class="photo">
+  <img src="images/${carSlug(car)}.jpg"
+       alt="${carName(car)}"
+       onerror="this.remove()">
+</div>
       <div class="body">
         <span class="badge ${car.status}">${car.status}</span>
         <h3>${carName(car)}</h3>

@@ -59,7 +59,18 @@ button:disabled { background: #b8c2cc; cursor: not-allowed; }
   border-radius: 10px;
   overflow: hidden;
 }
-.photo { height: 140px; display: grid; place-items: center; font-size: 4rem; }
+
+.photo {
+  height: 200px;
+  overflow: hidden;
+}
+.photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+/* .photo { height: 140px; display: grid; place-items: center; font-size: 4rem; } */
 .card .body { padding: 1rem; }
 .card h3 { margin: 0.5rem 0 0.25rem; }
 .card button { width: 100%; margin-top: 0.5rem; }
