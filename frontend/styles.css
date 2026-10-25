@@ -210,7 +210,7 @@ header {
 /* so the "Browse cars" link doesn't scroll the car grid under the sticky area */
 #cars { scroll-margin-top: 160px; }
 
-   :root { --navbar-h: 70px; }
+   :root { --navbar-h: 90px; }
 
 .sticky-top {
   position: sticky;

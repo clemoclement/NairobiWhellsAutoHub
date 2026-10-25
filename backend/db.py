@@ -75,7 +75,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS unique_receipt
 
 # (make, model, year, category, condition, price, specs)
 SAMPLE_CARS = [
-    ("Lamborghini", "Huracán", 2021, "Supercars", "Used", 38500000, "5.2L V10, 631 hp, AWD"),
+    ("Lamborghini", "Huracán", 2021, "Supercar", "Used", 38500000, "5.2L V10, 631 hp, AWD"),
     ("Ferrari", "F8 Tributo", 2022, "Supercars", "Used", 44000000, "3.9L V8 twin-turbo, 710 hp"),
     ("Toyota", "Land Cruiser Prado", 2020, "SUVs", "Used", 7800000, "2.8L diesel, 4WD, 7 seats"),
     ("Subaru", "Forester", 2019, "SUVs", "Used", 3200000, "2.0L petrol, AWD, CVT"),
