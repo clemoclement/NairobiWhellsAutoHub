@@ -207,13 +207,41 @@ header {
   font-size: 0.85rem;
 }
 
+/* so the "Browse cars" link doesn't scroll the car grid under the sticky area */
+#cars { scroll-margin-top: 400px; }
+
+   header { position: sticky; top: 0; z-index: 200; }
+
+
+   :root { --navbar-h: 99px; }
+
 .sticky-top {
   position: sticky;
   top: 0;
   z-index: 200;
 }
 
-/* so the "Browse cars" link doesn't scroll the car grid under the sticky area */
-#cars { scroll-margin-top: 400px; }
+.sticky-top header {
+  height: var(--navbar-h);
+  padding-top: 0;
+  padding-bottom: 0;
+  display: flex;
+  align-items: center;
+}
 
-   header { position: sticky; top: 0; z-index: 200; }
+/* Search section as a sticky block */
+.filters {
+  position: sticky;
+  top: var(--navbar-h);
+  z-index: 90;
+  background: #fff;
+  border: 1px solid #e3e8ef;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 16px;
+  margin: 16px auto;
+  max-width: 1200px;
+}
+
+
+
