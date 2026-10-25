@@ -196,20 +196,16 @@ header {
 }
 
 .hero {
-  padding: 24px 20px;   /* was 80px 20px */
+  padding: 4px 20px;
 }
 
-.hero h2 { font-size: 2rem; margin: 0 0 8px; }   /* was 2.4rem and 12px */
-.hero p  { font-size: 1rem; margin: 0 0 16px; }  /* was 1.1rem and 24px */
+.hero h2 { font-size: 1.2rem; margin: 0 0 2px; }
+.hero p  { font-size: 0.85rem; margin: 0 0 6px; }
 
-
-/* .hero {
-  min-height: 280px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-} */
-
+.hero-btn {
+  padding: 5px 16px;
+  font-size: 0.85rem;
+}
 
 .sticky-top {
   position: sticky;
