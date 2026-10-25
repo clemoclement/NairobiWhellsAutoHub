@@ -208,12 +208,9 @@ header {
 }
 
 /* so the "Browse cars" link doesn't scroll the car grid under the sticky area */
-#cars { scroll-margin-top: 400px; }
+#cars { scroll-margin-top: 160px; }
 
-   header { position: sticky; top: 0; z-index: 200; }
-
-
-   :root { --navbar-h: 99px; }
+   :root { --navbar-h: 70px; }
 
 .sticky-top {
   position: sticky;
@@ -222,7 +219,8 @@ header {
 }
 
 .sticky-top header {
-  height: var(--navbar-h);
+  zoom: 0.7;
+  height: 100px;      /* renders as 70px after the zoom */
   padding-top: 0;
   padding-bottom: 0;
   display: flex;
@@ -244,4 +242,34 @@ header {
 }
 
 
+:root { --hero-h: 88px; }   /* adjust to the hero's real height */
 
+.hero {
+  position: sticky;
+  top: var(--navbar-h);
+  z-index: 95;
+  height: var(--hero-h);
+  overflow: hidden;
+}
+
+.filters {
+  top: calc(var(--navbar-h) + var(--hero-h));   /* replaces the old top value */
+}
+
+.hero {
+  zoom: 0.7;
+}
+
+
+main {
+  padding-top: 0;
+  margin-top: 0;
+}
+
+.filters {
+  margin: 4px auto 12px;   /* was 16px auto */
+}
+
+.hero {
+  margin-bottom: 0;
+}
