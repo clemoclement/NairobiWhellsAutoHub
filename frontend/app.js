@@ -259,3 +259,16 @@ async function start() {
   setInterval(reloadAll, 30000); // pick up other people's reservations
 }
 start();
+
+const accountBox = document.getElementById('account');
+const toggle = document.getElementById('account-toggle');
+const menu = document.getElementById('account-menu');
+
+function setMenu(open) {
+  menu.hidden = !open;
+  toggle.setAttribute('aria-expanded', open);
+}
+
+toggle.addEventListener('click', () => setMenu(menu.hidden));
+document.addEventListener('click', (e) => { if (!accountBox.contains(e.target)) setMenu(false); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setMenu(false); });
