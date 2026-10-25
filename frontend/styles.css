@@ -172,3 +172,40 @@ header {
   text-decoration: underline;
   cursor: pointer;
 }
+
+
+.hero {
+  background: linear-gradient(rgba(11, 92, 171, 0.85), rgba(6, 40, 80, 0.9)),
+              url('hero.jpg') center / cover no-repeat;
+  color: #fff;
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.hero h2 { font-size: 2.4rem; margin: 0 0 12px; }
+.hero p { font-size: 1.1rem; margin: 0 0 24px; opacity: 0.9; }
+
+.hero-btn {
+  display: inline-block;
+  padding: 12px 28px;
+  background: #fff;
+  color: #0b5cab;
+  font-weight: 600;
+  border-radius: 8px;
+  text-decoration: none;
+}
+
+.hero {
+  padding: 24px 20px;   /* was 80px 20px */
+}
+
+.hero h2 { font-size: 2rem; margin: 0 0 8px; }   /* was 2.4rem and 12px */
+.hero p  { font-size: 1rem; margin: 0 0 16px; }  /* was 1.1rem and 24px */
+
+
+/* .hero {
+  min-height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+} */
