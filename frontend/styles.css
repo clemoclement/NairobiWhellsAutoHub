@@ -209,3 +209,15 @@ header {
   align-items: center;
   justify-content: center;
 } */
+
+
+.sticky-top {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+}
+
+/* so the "Browse cars" link doesn't scroll the car grid under the sticky area */
+#cars { scroll-margin-top: 400px; }
+
+   header { position: sticky; top: 0; z-index: 200; }
