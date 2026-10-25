@@ -3,32 +3,39 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AutoHub Cars</title>
+  <title>NairobiWheelsAutoHubke</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header>
-    <h1>AutoHub Cars</h1>
-    <div id="account">
-      <form id="login-form" class="auth">
-        <input id="login-email" type="email" placeholder="Email" autocomplete="username" required>
-        <input id="login-password" type="password" placeholder="Password" autocomplete="current-password" required>
-        <button>Log in</button>
-        <button type="button" id="show-register" class="link">Create account</button>
-      </form>
+  <h1>NairobiWheelsAutoHub</h1>
 
-      <form id="register-form" class="auth" hidden>
-        <input id="reg-name" placeholder="Full name" autocomplete="name" required>
-        <input id="reg-email" type="email" placeholder="Email" autocomplete="email" required>
-        <input id="reg-phone" placeholder="Phone (07XXXXXXXX)" autocomplete="tel" required>
-        <input id="reg-password" type="password" placeholder="Password (8+ characters)" minlength="8" autocomplete="new-password" required>
-        <button>Sign up</button>
-        <button type="button" id="show-login" class="link">I have an account</button>
-      </form>
+  <div id="account">
+    <button type="button" id="account-toggle" aria-expanded="false" aria-controls="account-menu">
+      Account ▾
+    </button>
 
-      <p id="user-info" hidden></p>
-    </div>
-  </header>
+    <div id="account-menu" class="dropdown" hidden>
+  <form id="login-form" class="auth">
+    <input id="login-email" type="email" placeholder="Email" autocomplete="email" required>
+    <input id="login-password" type="password" placeholder="Password" autocomplete="current-password" required>
+    <button>Log in</button>
+    <button type="button" id="show-register" class="link">Create account</button>
+  </form>
+
+  <form id="register-form" class="auth" hidden>
+    <input id="reg-name" placeholder="Full name" autocomplete="name" required>
+    <input id="reg-email" type="email" placeholder="Email" autocomplete="email" required>
+    <input id="reg-phone" placeholder="Phone (07XXXXXXXX)" autocomplete="tel" required>
+    <input id="reg-password" type="password" placeholder="Password (8+ characters)" autocomplete="new-password" required>
+    <button>Sign up</button>
+    <button type="button" id="show-login" class="link">I have an account</button>
+  </form>
+</div>
+
+    <p id="user-info" hidden></p>
+  </div>
+</header>
 
   <p id="message" role="status"></p>
 
