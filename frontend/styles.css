@@ -410,3 +410,40 @@ main {
   min-width: 110px;
   white-space: nowrap;
 }
+
+/* Search button + panel inside the hero */
+.search-toggle {
+  margin: 8px 0 0 8px;
+  padding: 6px 14px;
+  background: #fff;
+  color: #0d5cab;
+  font-weight: 600;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.search-toggle:hover { background: #eaf2fb; }
+
+.hero .filters {
+  position: static;          /* cancel the old sticky/overlap behaviour */
+  margin: 14px auto 0;
+  max-width: 900px;
+  display: grid;
+  grid-template-columns: 2fr 1.2fr 1fr 1fr;
+  gap: 10px;
+  padding: 14px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .25);
+  animation: dropIn .2s ease-out;
+}
+.hero .filters[hidden] { display: none; }   /* needed because display:grid overrides [hidden] */
+
+@keyframes dropIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 700px) {
+  .hero .filters { grid-template-columns: 1fr 1fr; }
+}
