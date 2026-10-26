@@ -377,3 +377,36 @@ main {
 
 /* Status badges */
 .admin .badge { font-weight: 600; letter-spacing: .02em; }
+
+/* Align status, Edit and Delete in the same columns on every car row */
+.admin #car-list > * {
+  display: grid;
+  grid-template-columns: 1fr 150px 90px 100px;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin #car-list select {
+  width: 100%;
+}
+
+.admin #car-list button {
+  width: 100%;
+  padding: 12px 0;
+  text-align: center;
+}
+
+/* Align the status badge in the same column on every order row */
+.admin #order-list > * {
+  display: grid;
+  grid-template-columns: 1fr 140px;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin #order-list .badge {
+  justify-self: end;
+  text-align: center;
+  min-width: 110px;
+  white-space: nowrap;
+}
