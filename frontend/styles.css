@@ -486,3 +486,52 @@ main {
 .hero {
   background: linear-gradient(180deg, #1f6fb5 0%, #0a2f57 100%);
 }
+
+
+/* Replace the previous footer CSS at the end of styles.css with this.
+   Everything is scoped to .site-footer / .sf-*, except the one body padding rule. */
+:root{--sf-h:48px}
+body{padding-bottom:calc(var(--sf-h) + env(safe-area-inset-bottom,0px))} /* keeps page content from hiding behind the footer */
+
+.site-footer{
+  --sf-bg:#0E2A2F; --sf-line:rgba(230,239,234,.16);
+  --sf-text:#E6EFEA; --sf-muted:#9DB5B0; --sf-accent:#F2B84B;
+  position:fixed; left:0; right:0; bottom:0; z-index:50;
+  background:var(--sf-bg); color:var(--sf-text);
+  border-top:1px solid var(--sf-line);
+  box-shadow:0 -6px 18px rgba(0,0,0,.18);
+  padding:0 20px env(safe-area-inset-bottom,0px);
+  font-family:"Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size:13px; line-height:1.4; box-sizing:border-box;
+}
+.site-footer *{box-sizing:border-box}
+.sf-row{max-width:1100px;margin:0 auto;min-height:var(--sf-h);display:flex;align-items:center;justify-content:space-between;gap:8px 20px}
+.sf-brand{font-family:"Fraunces", Georgia, serif;font-weight:600;font-size:15px;display:flex;align-items:center;gap:7px;white-space:nowrap}
+.sf-brand i{width:8px;height:8px;border-radius:50%;background:var(--sf-accent);flex:none}
+.sf-nav{display:flex;gap:18px}
+.sf-end{display:flex;align-items:center;gap:14px}
+.sf-copy{color:var(--sf-muted);font-size:12px;white-space:nowrap}
+.site-footer a{color:var(--sf-muted);text-decoration:none;transition:color .15s}
+.site-footer a:hover{color:var(--sf-accent)}
+.site-footer a:focus-visible{outline:2px solid var(--sf-accent);outline-offset:3px;border-radius:4px}
+.sf-social{display:flex;gap:6px}
+.sf-social a{width:26px;height:26px;border:1px solid var(--sf-line);border-radius:50%;display:grid;place-items:center;color:var(--sf-text)}
+.sf-social a:hover{border-color:var(--sf-accent)}
+.sf-social svg{width:12px;height:12px;fill:currentColor}
+
+/* Tablet: drop the copyright text */
+@media (max-width:860px){ .sf-copy{display:none} }
+
+/* Phone: brand name shortens, social icons hide, nav fits one row */
+@media (max-width:560px){
+  :root{--sf-h:44px}
+  .site-footer{padding-left:14px;padding-right:14px}
+  .sf-brand{font-size:14px}
+  .sf-nav{gap:14px}
+  .sf-social{display:none}
+}
+@media (max-width:420px){
+  .sf-brand{font-size:0}          /* hide name text, keep the accent dot */
+  .sf-brand i{width:10px;height:10px}
+  .sf-row{justify-content:center}
+}
