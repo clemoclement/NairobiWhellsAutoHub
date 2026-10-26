@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NairobiWheelsAutoHub</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Instrument+Sans:wght@400;500&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+  <div class="sticky-top">
+  <header class="nw-header">
+
+    <a class="nw-brand" href="index.html" aria-label="NairobiWheelsAutoHub home"><i></i><span>NairobiWheelsAutoHub</span></a>
+
+    <p class="nw-tagline">New, off-shore and locally used cars. Reserve online, then visit us.</p>
+
+    <div class="nw-actions">
+      <a href="#cars" class="hero-btn">Browse cars</a>
+      <button id="search-toggle" class="search-toggle" type="button" aria-expanded="false" aria-controls="filters">🔍 Search cars</button>
+    </div>
+
+  <div id="account">
+    <button type="button" id="account-toggle" aria-expanded="false" aria-controls="account-menu">
+      Account ▾
+    </button>
+
+    <div id="account-menu" class="dropdown" hidden>
+  <form id="login-form" class="auth">
+    <input id="login-email" type="email" placeholder="Email" autocomplete="email" required>
+    <input id="login-password" type="password" placeholder="Password" autocomplete="current-password" required>
+    <button>Log in</button>
+    <button type="button" id="show-register" class="link">Create account</button>
+  </form>
+
+  <form id="register-form" class="auth" hidden>
+    <input id="reg-name" placeholder="Full name" autocomplete="name" required>
+    <input id="reg-email" type="email" placeholder="Email" autocomplete="email" required>
+    <input id="reg-phone" placeholder="Phone (07XXXXXXXX)" autocomplete="tel" required>
+    <input id="reg-password" type="password" placeholder="Password (8+ characters)" autocomplete="new-password" required>
+    <button>Sign up</button>
+    <button type="button" id="show-login" class="link">I have an account</button>
+  </form>
+</div>
+
+    <p id="user-info" hidden></p>
+  </div>
+</header>
+
+<section id="filters" class="filters" hidden>
+  <input id="search" type="search" placeholder="Search make, model or year">
+  <select id="category"></select>
+  <input id="year" type="number" min="1990" placeholder="Year">
+  <input id="max-price" type="number" min="0" placeholder="Max price (KES)">
+</section>
+
+</div>
+
+  <p id="message" role="status"></p>
+
+  <main>
+    <section id="cars" class="grid"></section>
+
+    <h2>My orders</h2>
+    <section id="orders"></section>
+  </main>
+
+  <footer>Dealership staff: <a href="admin.html">admin login</a></footer>
+
+  <!-- Replace your existing <footer class="site-footer">…</footer> block with this one -->
+<footer class="site-footer">
+  <div class="sf-row">
+    <div class="sf-brand"><i></i>NairobiWheelsAutoHub</div>
+    <nav class="sf-nav" aria-label="Footer">
+      <a href="#cars">Cars</a>
+      <a href="#">About</a>
+      <a href="#">Help</a>
+      <a href="#">Contact</a>
+    </nav>
+    <div class="sf-end">
+      <span class="sf-copy">© 2026 · <a href="#">Privacy</a> · <a href="#">Terms</a></span>
+      <div class="sf-social">
+        <a href="#" aria-label="X"><svg viewBox="0 0 24 24"><path d="M18.2 2H21l-6.5 7.4L22 22h-6l-4.7-6.1L5.9 22H3l7-7.9L2.5 2h6.1l4.3 5.7L18.2 2Zm-1 18h1.6L7.9 3.9H6.2L17.2 20Z"/></svg></a>
+        <a href="#" aria-label="LinkedIn"><svg viewBox="0 0 24 24"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5ZM3 9.5h4V21H3V9.5Zm7 0h3.8v1.6c.5-1 1.8-2 3.8-2 4 0 4.8 2.6 4.8 6V21h-4v-5c0-1.2 0-2.8-1.7-2.8s-2 1.3-2 2.7V21h-4V9.5Z"/></svg></a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

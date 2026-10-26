@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AutoHub frontend tests</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 700px; margin: 2rem auto; padding: 0 1rem; }
+    li { margin: 0.35rem 0; list-style: none; }
+    .pass::before { content: '✅ '; }
+    .fail::before { content: '❌ '; }
+    .fail { color: #922b21; }
+    #summary { font-weight: 600; font-size: 1.1rem; }
+  </style>
+</head>
+<body>
+  <h1>AutoHub frontend tests</h1>
+  <p>The business rules are tested on the server (<code>python -m unittest</code>). These test the page helpers.</p>
+  <p id="summary"></p>
+  <ul id="results"></ul>
+
+  <script type="module">
+    import { formatPrice, escapeHtml, hoursLeft, debounce } from './util.js';
+
+    let passed = 0, failed = 0;
+    function test(name, fn) {
+      const li = document.createElement('li');
+      Promise.resolve().then(fn).then(
+        () => { li.className = 'pass'; li.textContent = name; passed++; },
+        (error) => { li.className = 'fail'; li.textContent = `${name}: ${error.message}`; failed++; },
+      ).then(() => {
+        document.getElementById('summary').textContent =
+          failed === 0 ? `All ${passed} tests passed` : `${failed} failed, ${passed} passed`;
+      });
+      document.getElementById('results').append(li);
+    }
+    function expect(actual, expected) {
+      if (actual !== expected) throw new Error(`expected ${expected} but got ${actual}`);
+    }
+
+    test('formatPrice adds KES and commas', () => expect(formatPrice(3600000), 'KES 3,600,000'));
+    test('formatPrice works with small numbers', () => expect(formatPrice(980), 'KES 980'));
+    test('escapeHtml turns tags into harmless text', () =>
+      expect(escapeHtml('<b>hi</b>'), '&lt;b&gt;hi&lt;/b&gt;'));
+    test('escapeHtml handles quotes and ampersands', () =>
+      expect(escapeHtml(`Tom & "Jerry's"`), 'Tom &amp; &quot;Jerry&#39;s&quot;'));
+    test('escapeHtml accepts numbers', () => expect(escapeHtml(2021), '2021'));
+    test('hoursLeft rounds up', () => expect(hoursLeft(1000 + 5400, 1000 * 1000), 2));
+    test('hoursLeft never goes below zero', () => expect(hoursLeft(1, 5000 * 1000), 0));
+    test('debounce runs only once after several quick calls', async () => {
+      let calls = 0;
+      const run = debounce(() => calls++, 20);
+      run(); run(); run();
+      await new Promise((resolve) => setTimeout(resolve, 60));
+      expect(calls, 1);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,601 @@
+:root {
+  --brand: #082333;
+  --text: #1c2833;
+  --muted: #6b7885;
+  --border: #dde3e9;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  color: var(--text);
+  background: #e6e7ea;
+}
+
+header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: var(--brand);
+  color: white;
+}
+header h1 { margin: 0; font-size: 1.8rem; }
+#signin-form { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+#user-info { margin: 0; }
+
+main { max-width: 1100px; margin: 0 auto; padding: 1.5rem; }
+
+input, select, button {
+  font: inherit;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+button {
+  background: var(--brand);
+  color: rgb(225, 219, 221);
+  border: none;
+  cursor: pointer;
+}
+button:disabled { background: #b8c2cc; cursor: not-allowed; }
+
+.filters { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.5rem; }
+.filters input { flex: 1; min-width: 200px; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.photo {
+  height: 200px;
+  overflow: hidden;
+}
+.photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+/* .photo { height: 140px; display: grid; place-items: center; font-size: 4rem; } */
+.card .body { padding: 1rem; }
+.card h3 { margin: 0.5rem 0 0.25rem; }
+.card button { width: 100%; margin-top: 0.5rem; }
+
+.muted { color: var(--muted); font-size: 0.9rem; margin: 0.25rem 0; }
+.price { font-weight: 600; font-size: 1.1rem; margin: 0.5rem 0; }
+
+.badge {
+  font-size: 0.75rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  text-transform: capitalize;
+}
+.badge.available, .badge.paid { background: #d5f5e3; color: #1e8449; }
+.badge.reserved, .badge.pending { background: #fcf3cf; color: #9a7d0a; }
+.badge.sold, .badge.cancelled { background: #fadbd8; color: #922b21; }
+
+.order {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+}
+
+#message { margin: 0; padding: 0; text-align: center; font-weight: 500; }
+#message.show { padding: 0.75rem; background: #fef9e7; }
+
+.badge.confirmed { background: #d6eaf8; color: #1b4f72; }
+.badge.completed { background: #d5f5e3; color: #1e8449; }
+
+.row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+.row input { flex: 1; min-width: 120px; }
+
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem; }
+.stat { background: white; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; }
+.stat span { display: block; color: var(--muted); font-size: 0.9rem; }
+.stat strong { font-size: 1.3rem; }
+.order button { margin-left: 0.25rem; }
+
+/* ---- added for the connected version ---- */
+.auth { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+.auth input { width: 150px; }
+.link { background: none; color: white; text-decoration: underline; padding: 0.25rem; }
+#user-info { display: flex; gap: 0.5rem; align-items: center; margin: 0; }
+.mock-box {
+  flex-basis: 100%;
+  background: #fef9e7;
+  border: 1px dashed #d4ac0d;
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9rem;
+}
+.mock-box button { margin-left: 0.25rem; }
+.badge.refund { background: #fadbd8; color: #922b21; }
+footer { text-align: center; color: var(--muted); padding: 1.5rem; font-size: 0.9rem; }
+
+
+
+[hidden] { display: none !important; }
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#account { position: relative; }
+
+#account-toggle {
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 8px;
+  background: #fff;
+  color: #0b5cab;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  width: 300px;
+  padding: 16px;
+  background: #fff;
+  color: #222;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  z-index: 100;
+}
+
+.auth {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.auth input { width: 100%; box-sizing: border-box; }
+
+.auth .link {
+  background: none;
+  border: 0;
+  color: #0b5cab;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+
+.hero {
+  background: linear-gradient(rgba(11, 92, 171, 0.85), rgba(6, 40, 80, 0.9)),
+              url('hero.jpg') center / cover no-repeat;
+  color: #fff;
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.hero h2 { font-size: 2.4rem; margin: 0 0 12px; }
+.hero p { font-size: 1.1rem; margin: 0 0 24px; opacity: 0.9; }
+
+.hero-btn {
+  display: inline-block;
+  padding: 12px 28px;
+  background: #fff;
+  color: #0b5cab;
+  font-weight: 600;
+  border-radius: 8px;
+  text-decoration: none;
+}
+
+.hero {
+  padding: 4px 20px;
+}
+
+.hero h2 { font-size: 1.2rem; margin: 0 0 2px; }
+.hero p  { font-size: 0.85rem; margin: 0 0 6px; }
+
+.hero-btn {
+  padding: 5px 16px;
+  font-size: 0.85rem;
+}
+
+/* so the "Browse cars" link doesn't scroll the car grid under the sticky area */
+#cars { scroll-margin-top: 160px; }
+
+   :root { --navbar-h: 90px; }
+
+.sticky-top {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+}
+
+.sticky-top header {
+  zoom: 0.7;
+  height: 100px;      /* renders as 70px after the zoom */
+  padding-top: 0;
+  padding-bottom: 0;
+  display: flex;
+  align-items: center;
+}
+
+/* Search section as a sticky block */
+.filters {
+  position: sticky;
+  top: var(--navbar-h);
+  z-index: 90;
+  background: #fff;
+  border: 1px solid #e3e8ef;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 16px;
+  margin: 16px auto;
+  max-width: 1200px;
+}
+
+
+:root { --hero-h: 88px; }   /* adjust to the hero's real height */
+
+.hero {
+  position: sticky;
+  top: var(--navbar-h);
+  z-index: 95;
+  height: var(--hero-h);
+  overflow: hidden;
+}
+
+.filters {
+  top: calc(var(--navbar-h) + var(--hero-h));   /* replaces the old top value */
+}
+
+.hero {
+  zoom: 0.7;
+}
+
+
+main {
+  padding-top: 0;
+  margin-top: 0;
+}
+
+.filters {
+  margin: 4px auto 12px;   /* was 16px auto */
+}
+
+.hero {
+  margin-bottom: 0;
+}
+
+/* ===== Admin page ===== */
+.admin {
+  background: linear-gradient(180deg, #eef2f7 0%, #e3e9f1 100%);
+  min-height: 100vh;
+}
+
+.admin header {
+  background: linear-gradient(135deg, #0a2540 0%, #0d5cab 100%);
+  box-shadow: 0 4px 18px rgba(10, 37, 64, 0.25);
+}
+.admin header a { opacity: .85; transition: opacity .2s; }
+.admin header a:hover { opacity: 1; }
+
+.admin main { max-width: 1200px; margin: 0 auto; padding: 24px 20px 60px; }
+
+/* Section headings with an accent bar */
+.admin h2 {
+  display: flex; align-items: center; gap: 10px;
+  margin: 36px 0 16px;
+  font-size: 1.35rem; color: #0a2540;
+}
+.admin h2::before {
+  content: ""; width: 5px; height: 1.2em;
+  background: #0d5cab; border-radius: 3px;
+}
+
+/* Login card */
+.admin #login {
+  max-width: 560px; margin: 40px auto;
+  background: #fff; padding: 28px;
+  border-radius: 16px; box-shadow: 0 10px 30px rgba(10, 37, 64, .12);
+}
+
+/* Sales report cards */
+.admin #report > * {
+  background: #fff; border: 0; border-radius: 16px;
+  border-top: 4px solid #0d5cab;
+  box-shadow: 0 6px 18px rgba(10, 37, 64, .08);
+  transition: transform .2s, box-shadow .2s;
+}
+.admin #report > *:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 26px rgba(10, 37, 64, .15);
+}
+.admin #report > *:nth-child(2) { border-top-color: #16a34a; }
+.admin #report > *:nth-child(3) { border-top-color: #f59e0b; }
+.admin #report > *:nth-child(4) { border-top-color: #0891b2; }
+.admin #report > *:nth-child(5) { border-top-color: #7c3aed; }
+
+/* Add-a-car form */
+.admin #car-form {
+  background: #fff; padding: 20px;
+  border-radius: 16px; box-shadow: 0 6px 18px rgba(10, 37, 64, .08);
+}
+
+/* Inputs */
+.admin input, .admin select {
+  border: 1px solid #d5dce6; border-radius: 10px;
+  background: #f8fafc; transition: border-color .2s, box-shadow .2s;
+}
+.admin input:focus, .admin select:focus {
+  outline: none; border-color: #0d5cab; background: #fff;
+  box-shadow: 0 0 0 3px rgba(13, 92, 171, .18);
+}
+
+/* Buttons */
+.admin button {
+  background: #0d5cab; color: #fff; border: 0; border-radius: 10px;
+  cursor: pointer; transition: background .2s, transform .1s;
+}
+.admin button:hover { background: #0a4a8a; }
+.admin button:active { transform: scale(.97); }
+.admin [data-edit]  { background: #0891b2; }
+.admin [data-edit]:hover  { background: #0e7490; }
+.admin [data-id]    { background: #dc2626; }   /* Delete */
+.admin [data-id]:hover    { background: #b91c1c; }
+.admin #logout      { background: #475569; }
+
+/* Car and order rows */
+.admin #car-list > *, .admin #order-list > * {
+  background: #fff; border: 0; border-radius: 14px;
+  border-left: 5px solid #0d5cab;
+  box-shadow: 0 4px 14px rgba(10, 37, 64, .07);
+  transition: transform .15s, box-shadow .15s;
+}
+.admin #car-list > *:hover, .admin #order-list > *:hover {
+  transform: translateX(3px);
+  box-shadow: 0 8px 20px rgba(10, 37, 64, .13);
+}
+
+/* Status badges */
+.admin .badge { font-weight: 600; letter-spacing: .02em; }
+
+/* Align status, Edit and Delete in the same columns on every car row */
+.admin #car-list > * {
+  display: grid;
+  grid-template-columns: 1fr 150px 90px 100px;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin #car-list select {
+  width: 100%;
+}
+
+.admin #car-list button {
+  width: 100%;
+  padding: 12px 0;
+  text-align: center;
+}
+
+/* Align the status badge in the same column on every order row */
+.admin #order-list > * {
+  display: grid;
+  grid-template-columns: 1fr 140px;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin #order-list .badge {
+  justify-self: end;
+  text-align: center;
+  min-width: 110px;
+  white-space: nowrap;
+}
+
+/* Search button + panel inside the hero */
+.search-toggle {
+  margin: 8px 0 0 8px;
+  padding: 6px 14px;
+  background: #fff;
+  color: #0d5cab;
+  font-weight: 600;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.search-toggle:hover { background: #eaf2fb; }
+
+.hero .filters {
+  position: static;          /* cancel the old sticky/overlap behaviour */
+  margin: 14px auto 0;
+  max-width: 900px;
+  display: grid;
+  grid-template-columns: 2fr 1.2fr 1fr 1fr;
+  gap: 10px;
+  padding: 14px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .25);
+  animation: dropIn .2s ease-out;
+}
+.hero .filters[hidden] { display: none; }   /* needed because display:grid overrides [hidden] */
+
+@keyframes dropIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 700px) {
+  .hero .filters { grid-template-columns: 1fr 1fr; }
+}
+
+/* Hero: 25% larger, content included */
+
+main {
+  position: relative;
+  z-index: 0;
+  margin-top: 24px;
+}
+
+.hero .filters { max-width: 720px; }
+
+/* Let the hero grow to fit its content, with room under the buttons */
+.hero {
+  height: auto !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+  padding-bottom: 28px !important;
+}
+
+.hero .hero-content,
+.hero > div {
+  height: auto !important;
+  overflow: visible !important;
+}
+
+.hero .btn,
+.hero a,
+.hero button {
+  position: relative;
+  line-height: 1.4;
+}
+
+.search-toggle {
+  margin-top: 12px;
+}
+
+.hero {
+  background: linear-gradient(180deg, #1f6fb5 0%, #0a2f57 100%);
+}
+
+
+/* Replace the previous footer CSS at the end of styles.css with this.
+   Everything is scoped to .site-footer / .sf-*, except the one body padding rule. */
+:root{--sf-h:48px}
+body{padding-bottom:calc(var(--sf-h) + env(safe-area-inset-bottom,0px))} /* keeps page content from hiding behind the footer */
+
+.site-footer{
+  --sf-bg:#0E2A2F; --sf-line:rgba(230,239,234,.16);
+  --sf-text:#E6EFEA; --sf-muted:#9DB5B0; --sf-accent:#F2B84B;
+  position:fixed; left:0; right:0; bottom:0; z-index:50;
+  background:var(--sf-bg); color:var(--sf-text);
+  border-top:1px solid var(--sf-line);
+  box-shadow:0 -6px 18px rgba(0,0,0,.18);
+  padding:0 20px env(safe-area-inset-bottom,0px);
+  font-family:"Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size:13px; line-height:1.4; box-sizing:border-box;
+}
+.site-footer *{box-sizing:border-box}
+.sf-row{max-width:1100px;margin:0 auto;min-height:var(--sf-h);display:flex;align-items:center;justify-content:space-between;gap:8px 20px}
+.sf-brand{font-family:"Fraunces", Georgia, serif;font-weight:600;font-size:15px;display:flex;align-items:center;gap:7px;white-space:nowrap}
+.sf-brand i{width:8px;height:8px;border-radius:50%;background:var(--sf-accent);flex:none}
+.sf-nav{display:flex;gap:18px}
+.sf-end{display:flex;align-items:center;gap:14px}
+.sf-copy{color:var(--sf-muted);font-size:12px;white-space:nowrap}
+.site-footer a{color:var(--sf-muted);text-decoration:none;transition:color .15s}
+.site-footer a:hover{color:var(--sf-accent)}
+.site-footer a:focus-visible{outline:2px solid var(--sf-accent);outline-offset:3px;border-radius:4px}
+.sf-social{display:flex;gap:6px}
+.sf-social a{width:26px;height:26px;border:1px solid var(--sf-line);border-radius:50%;display:grid;place-items:center;color:var(--sf-text)}
+.sf-social a:hover{border-color:var(--sf-accent)}
+.sf-social svg{width:12px;height:12px;fill:currentColor}
+
+/* Tablet: drop the copyright text */
+@media (max-width:860px){ .sf-copy{display:none} }
+
+/* Phone: brand name shortens, social icons hide, nav fits one row */
+@media (max-width:560px){
+  :root{--sf-h:44px}
+  .site-footer{padding-left:14px;padding-right:14px}
+  .sf-brand{font-size:14px}
+  .sf-nav{gap:14px}
+  .sf-social{display:none}
+}
+@media (max-width:420px){
+  .sf-brand{font-size:0}          /* hide name text, keep the accent dot */
+  .sf-brand i{width:10px;height:10px}
+  .sf-row{justify-content:center}
+}
+
+/* Add to the END of styles.css. You can delete the old .hero, .hero-content and
+   .hero-btn rules, plus the old header rules, since these replace them. */
+:root{
+  --nw-ink:#0C2430; --nw-ink-2:#12394A;
+  --nw-text:#F1F6F4; --nw-muted:#A9C0C4;
+  --nw-accent:#F2B84B; --nw-accent-ink:#2A1D00;
+  --nw-page:#F6F5F1;
+}
+body{background:var(--nw-page)}
+.sticky-top{position:sticky;top:0;z-index:60}
+
+/* ---------- Header (brand + tagline + actions + account) ---------- */
+.sticky-top .nw-header{
+  display:flex;align-items:center;gap:12px 24px;
+  padding:12px clamp(16px,4vw,40px);
+  background:linear-gradient(120deg,var(--nw-ink) 0%,var(--nw-ink-2) 100%);
+  color:var(--nw-text);
+  border-bottom:3px solid var(--nw-accent);
+  box-shadow:0 6px 20px rgba(12,36,48,.25);
+}
+.nw-brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;white-space:nowrap;
+  font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:22px;letter-spacing:-.01em}
+.nw-brand i{width:11px;height:11px;border-radius:50%;background:var(--nw-accent);flex:none}
+.nw-tagline{flex:1;margin:0;max-width:44ch;font-size:14px;line-height:1.4;color:var(--nw-muted)}
+
+.nw-actions{display:flex;gap:10px;margin-left:auto}
+.nw-actions .hero-btn,
+.nw-actions .search-toggle{
+  display:inline-flex;align-items:center;gap:6px;
+  font:inherit;font-size:14px;font-weight:600;line-height:1.2;
+  padding:9px 18px;border-radius:999px;cursor:pointer;text-decoration:none;
+  transition:background .15s,border-color .15s,transform .15s;
+}
+.nw-actions .hero-btn{background:var(--nw-accent);color:var(--nw-accent-ink);border:1px solid var(--nw-accent)}
+.nw-actions .hero-btn:hover{background:#F7C867;transform:translateY(-1px)}
+.nw-actions .search-toggle{background:transparent;color:var(--nw-text);border:1px solid rgba(255,255,255,.35)}
+.nw-actions .search-toggle:hover,
+.nw-actions .search-toggle[aria-expanded="true"]{background:rgba(255,255,255,.12);border-color:var(--nw-accent)}
+.nw-actions a:focus-visible,.nw-actions button:focus-visible{outline:2px solid var(--nw-accent);outline-offset:3px}
+
+/* Account block keeps your markup; this only softens its colors */
+.nw-header #account{margin-left:8px;text-align:right;font-size:13px;color:var(--nw-muted)}
+.nw-header #account a{color:var(--nw-muted)}
+.nw-header #account a:hover{color:var(--nw-accent)}
+
+/* ---------- Search filters (slides under the header when toggled) ---------- */
+#filters{display:flex;flex-wrap:wrap;gap:10px;padding:14px clamp(16px,4vw,40px);
+  background:#fff;border-bottom:1px solid #E4E2DA;box-shadow:0 8px 20px rgba(12,36,48,.08)}
+#filters[hidden]{display:none}
+#filters input,#filters select{flex:1 1 160px;min-width:0;padding:10px 12px;font:inherit;font-size:14px;
+  color:#1B2A2E;background:#FBFAF7;border:1px solid #D9D6CC;border-radius:10px}
+#filters input:focus,#filters select:focus{outline:none;border-color:var(--nw-accent);box-shadow:0 0 0 3px rgba(242,184,75,.3)}
+
+#message:empty{display:none}
+
+/* ---------- Smaller screens ---------- */
+@media (max-width:1000px){ .nw-tagline{display:none} }
+@media (max-width:640px){
+  .sticky-top .nw-header{flex-wrap:wrap;padding:10px 16px}
+  .nw-brand{order:1;flex:1;font-size:19px}
+  .nw-header #account{order:2;margin-left:0}
+  .nw-actions{order:3;width:100%;margin:0;justify-content:center}
+}

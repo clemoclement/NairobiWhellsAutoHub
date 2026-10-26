@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NairobiWheelsAutoHub Admin</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="admin">
+  <header>
+    <h1>NairobiWheelsAutoHub Admin</h1>
+    <nav><a href="index.html" style="color:white">Customer site</a></nav>
+  </header>
+
+  <p id="message" role="status"></p>
+
+  <main>
+    <section id="login">
+      <h2>Admin login</h2>
+      <form id="login-form" class="row">
+        <input id="email" type="email" placeholder="Admin email" autocomplete="username" required>
+        <input id="password" type="password" placeholder="Password" autocomplete="current-password" required>
+        <button>Log in</button>
+      </form>
+      <p class="muted">Admin accounts are created on the server with: <code>flask --app app create-admin</code></p>
+    </section>
+
+    <div id="dashboard" hidden>
+      <p><span id="who"></span> <button id="logout">Log out</button>
+        <span class="muted">· refreshes every 15 seconds</span></p>
+
+      <h2>Sales report</h2>
+      <section id="report" class="stats"></section>
+
+      <h2>Add a car</h2>
+      <form id="car-form" class="row">
+        <input id="make" placeholder="Make" required>
+        <input id="model" placeholder="Model" required>
+        <input id="year" type="number" placeholder="Year" required>
+        <select id="category"></select>
+        <select id="condition"><option>Used</option><option>New</option></select>
+        <input id="price" type="number" min="1" step="1" placeholder="Price (KES)" required>
+        <input id="specs" placeholder="Specs (optional)">
+        <button>Add car</button>
+      </form>
+
+      <h2>Orders</h2>
+      <section id="order-list"></section>
+
+      <h2>Cars</h2>
+      <section id="car-list"></section>
+    </div>
+  </main>
+
+  <script type="module" src="admin.js"></script>
+</body>
+</html>
