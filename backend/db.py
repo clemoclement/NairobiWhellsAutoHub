@@ -80,12 +80,16 @@ SAMPLE_CARS = [
     ("Toyota", "Land Cruiser Prado", 2020, "SUVs", "Used", 7800000, "2.8L diesel, 4WD, 7 seats"),
     ("Subaru", "Forester", 2019, "SUVs", "Used", 3200000, "2.0L petrol, AWD, CVT"),
     ("Mercedes-Benz", "C200", 2018, "Sedans", "Used", 4100000, "2.0L turbo, automatic"),
-    ("Toyota", "Corolla", 2023, "Sedans", "New", 3600000, "1.8L hybrid, automatic"),
+    ("Toyota", "Crown", 2023, "Sedans", "New", 3600000, "1.8L hybrid, automatic"),
     ("Suzuki", "Swift", 2021, "Small Personal Cars", "Used", 1450000, "1.2L petrol, manual"),
     ("Mazda", "Demio", 2017, "Small Personal Cars", "Used", 980000, "1.3L petrol, automatic"),
     ("Lamborghini", "Aventador", 2022, "SuperCars", "New", 1980000, "6.3L V12, 789 hp, AWD"),
     ("Mercedes-Benz", "Gle", 2023, "SUVs", "New", 14500000, "3.3L Petrol, V8, 489 hp, AWD"),
     ("Lexus", "LX 570", 2019, "SUVs", "New", 16000000, "5700cc Petrol, Brown Interior color, Pearl white Exterior color, Foreign used,"),
+    ("Toyota", "Crown", 2020, "Sedans", "Used", 22000000, "2000cc Petrol, Brown Interior color, Good condition,"),
+    ("Mazda", "Atenza", 2019, "Sedans", "New", 36000000, "2200cc Petrol"),
+
+
 
 ]
 
