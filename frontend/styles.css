@@ -1,5 +1,5 @@
 :root {
-  --brand: #0b5cad;
+  --brand: #082333;
   --text: #1c2833;
   --muted: #6b7885;
   --border: #dde3e9;
@@ -11,7 +11,7 @@ body {
   margin: 0;
   font-family: system-ui, sans-serif;
   color: var(--text);
-  background: #f5f7fa;
+  background: #e6e7ea;
 }
 
 header {
@@ -24,7 +24,7 @@ header {
   background: var(--brand);
   color: white;
 }
-header h1 { margin: 0; font-size: 1.4rem; }
+header h1 { margin: 0; font-size: 1.8rem; }
 #signin-form { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 #user-info { margin: 0; }
 
@@ -38,7 +38,7 @@ input, select, button {
 }
 button {
   background: var(--brand);
-  color: white;
+  color: rgb(225, 219, 221);
   border: none;
   cursor: pointer;
 }
@@ -284,3 +284,96 @@ main {
 .hero {
   margin-bottom: 0;
 }
+
+/* ===== Admin page ===== */
+.admin {
+  background: linear-gradient(180deg, #eef2f7 0%, #e3e9f1 100%);
+  min-height: 100vh;
+}
+
+.admin header {
+  background: linear-gradient(135deg, #0a2540 0%, #0d5cab 100%);
+  box-shadow: 0 4px 18px rgba(10, 37, 64, 0.25);
+}
+.admin header a { opacity: .85; transition: opacity .2s; }
+.admin header a:hover { opacity: 1; }
+
+.admin main { max-width: 1200px; margin: 0 auto; padding: 24px 20px 60px; }
+
+/* Section headings with an accent bar */
+.admin h2 {
+  display: flex; align-items: center; gap: 10px;
+  margin: 36px 0 16px;
+  font-size: 1.35rem; color: #0a2540;
+}
+.admin h2::before {
+  content: ""; width: 5px; height: 1.2em;
+  background: #0d5cab; border-radius: 3px;
+}
+
+/* Login card */
+.admin #login {
+  max-width: 560px; margin: 40px auto;
+  background: #fff; padding: 28px;
+  border-radius: 16px; box-shadow: 0 10px 30px rgba(10, 37, 64, .12);
+}
+
+/* Sales report cards */
+.admin #report > * {
+  background: #fff; border: 0; border-radius: 16px;
+  border-top: 4px solid #0d5cab;
+  box-shadow: 0 6px 18px rgba(10, 37, 64, .08);
+  transition: transform .2s, box-shadow .2s;
+}
+.admin #report > *:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 26px rgba(10, 37, 64, .15);
+}
+.admin #report > *:nth-child(2) { border-top-color: #16a34a; }
+.admin #report > *:nth-child(3) { border-top-color: #f59e0b; }
+.admin #report > *:nth-child(4) { border-top-color: #0891b2; }
+.admin #report > *:nth-child(5) { border-top-color: #7c3aed; }
+
+/* Add-a-car form */
+.admin #car-form {
+  background: #fff; padding: 20px;
+  border-radius: 16px; box-shadow: 0 6px 18px rgba(10, 37, 64, .08);
+}
+
+/* Inputs */
+.admin input, .admin select {
+  border: 1px solid #d5dce6; border-radius: 10px;
+  background: #f8fafc; transition: border-color .2s, box-shadow .2s;
+}
+.admin input:focus, .admin select:focus {
+  outline: none; border-color: #0d5cab; background: #fff;
+  box-shadow: 0 0 0 3px rgba(13, 92, 171, .18);
+}
+
+/* Buttons */
+.admin button {
+  background: #0d5cab; color: #fff; border: 0; border-radius: 10px;
+  cursor: pointer; transition: background .2s, transform .1s;
+}
+.admin button:hover { background: #0a4a8a; }
+.admin button:active { transform: scale(.97); }
+.admin [data-edit]  { background: #0891b2; }
+.admin [data-edit]:hover  { background: #0e7490; }
+.admin [data-id]    { background: #dc2626; }   /* Delete */
+.admin [data-id]:hover    { background: #b91c1c; }
+.admin #logout      { background: #475569; }
+
+/* Car and order rows */
+.admin #car-list > *, .admin #order-list > * {
+  background: #fff; border: 0; border-radius: 14px;
+  border-left: 5px solid #0d5cab;
+  box-shadow: 0 4px 14px rgba(10, 37, 64, .07);
+  transition: transform .15s, box-shadow .15s;
+}
+.admin #car-list > *:hover, .admin #order-list > *:hover {
+  transform: translateX(3px);
+  box-shadow: 0 8px 20px rgba(10, 37, 64, .13);
+}
+
+/* Status badges */
+.admin .badge { font-weight: 600; letter-spacing: .02em; }

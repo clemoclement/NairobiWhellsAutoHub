@@ -51,6 +51,7 @@ function renderCars() {
         ${['available', 'reserved', 'sold'].map((s) =>
           `<option ${s === car.status ? 'selected' : ''}>${s}</option>`).join('')}
       </select>
+      <button data-edit="${car.id}">Edit</button>
       <button data-delete="${car.id}">Delete</button>
     </div>`).join('') || '<p class="muted">No cars yet.</p>';
 }
@@ -157,6 +158,33 @@ $('#car-list').addEventListener('click', async (event) => {
   try {
     await api(`/cars/${id}`, { method: 'DELETE' });
     showMessage('Car deleted.');
+  } catch (error) {
+    showMessage(error.message);
+  }
+  await loadAll();
+});
+
+  // ---- Editing a car ----
+document.addEventListener('click', async (event) => {
+  const id = event.target.dataset.edit;
+  if (!id) return;
+
+  const price = prompt('New price in KES (leave blank to keep):');
+  const specs = prompt('New specs / colour (leave blank to keep):');
+  const changes = {};
+  if (price) changes.price = Number(price);
+  if (specs) changes.specs = specs;
+  if (!Object.keys(changes).length) return;
+
+  try {
+    const res = await fetch(`/api/admin/cars/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(changes),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Update failed');
+    showMessage('Car updated.');
   } catch (error) {
     showMessage(error.message);
   }

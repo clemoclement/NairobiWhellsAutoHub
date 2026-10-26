@@ -13,7 +13,7 @@ from werkzeug.security import check_password_hash
 
 import db
 import services
-from db import get_db
+from db import get_db, transaction
 from mpesa import MpesaClient
 from services import ServiceError, normalize_phone
 
@@ -358,6 +358,21 @@ def create_app(test_config=None):
     @admin_required
     def admin_report():
         return jsonify(services.sales_report(get_db()))
+
+    # ---- NEW: edit a car ----
+    @app.put("/api/admin/cars/<int:car_id>")
+    @admin_required
+    def admin_update_car(car_id):
+        data = request.get_json(silent=True) or {}
+        allowed = ["make", "model", "year", "category", "condition", "price", "specs"]
+        fields = {k: data[k] for k in allowed if k in data}
+        if not fields:
+            return jsonify(error="Nothing to update"), 400
+        sets = ", ".join(f"{k} = ?" for k in fields)
+        db = get_db()
+        with transaction(db):
+            db.execute(f"UPDATE cars SET {sets} WHERE id = ?", (*fields.values(), car_id))
+        return jsonify(ok=True)
 
     return app
 
