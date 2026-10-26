@@ -482,3 +482,7 @@ main {
 .search-toggle {
   margin-top: 12px;
 }
+
+.hero {
+  background: linear-gradient(180deg, #1f6fb5 0%, #0a2f57 100%);
+}
