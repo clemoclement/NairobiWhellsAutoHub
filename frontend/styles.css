@@ -535,3 +535,67 @@ body{padding-bottom:calc(var(--sf-h) + env(safe-area-inset-bottom,0px))} /* keep
   .sf-brand i{width:10px;height:10px}
   .sf-row{justify-content:center}
 }
+
+/* Add to the END of styles.css. You can delete the old .hero, .hero-content and
+   .hero-btn rules, plus the old header rules, since these replace them. */
+:root{
+  --nw-ink:#0C2430; --nw-ink-2:#12394A;
+  --nw-text:#F1F6F4; --nw-muted:#A9C0C4;
+  --nw-accent:#F2B84B; --nw-accent-ink:#2A1D00;
+  --nw-page:#F6F5F1;
+}
+body{background:var(--nw-page)}
+.sticky-top{position:sticky;top:0;z-index:60}
+
+/* ---------- Header (brand + tagline + actions + account) ---------- */
+.sticky-top .nw-header{
+  display:flex;align-items:center;gap:12px 24px;
+  padding:12px clamp(16px,4vw,40px);
+  background:linear-gradient(120deg,var(--nw-ink) 0%,var(--nw-ink-2) 100%);
+  color:var(--nw-text);
+  border-bottom:3px solid var(--nw-accent);
+  box-shadow:0 6px 20px rgba(12,36,48,.25);
+}
+.nw-brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;white-space:nowrap;
+  font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:22px;letter-spacing:-.01em}
+.nw-brand i{width:11px;height:11px;border-radius:50%;background:var(--nw-accent);flex:none}
+.nw-tagline{flex:1;margin:0;max-width:44ch;font-size:14px;line-height:1.4;color:var(--nw-muted)}
+
+.nw-actions{display:flex;gap:10px;margin-left:auto}
+.nw-actions .hero-btn,
+.nw-actions .search-toggle{
+  display:inline-flex;align-items:center;gap:6px;
+  font:inherit;font-size:14px;font-weight:600;line-height:1.2;
+  padding:9px 18px;border-radius:999px;cursor:pointer;text-decoration:none;
+  transition:background .15s,border-color .15s,transform .15s;
+}
+.nw-actions .hero-btn{background:var(--nw-accent);color:var(--nw-accent-ink);border:1px solid var(--nw-accent)}
+.nw-actions .hero-btn:hover{background:#F7C867;transform:translateY(-1px)}
+.nw-actions .search-toggle{background:transparent;color:var(--nw-text);border:1px solid rgba(255,255,255,.35)}
+.nw-actions .search-toggle:hover,
+.nw-actions .search-toggle[aria-expanded="true"]{background:rgba(255,255,255,.12);border-color:var(--nw-accent)}
+.nw-actions a:focus-visible,.nw-actions button:focus-visible{outline:2px solid var(--nw-accent);outline-offset:3px}
+
+/* Account block keeps your markup; this only softens its colors */
+.nw-header #account{margin-left:8px;text-align:right;font-size:13px;color:var(--nw-muted)}
+.nw-header #account a{color:var(--nw-muted)}
+.nw-header #account a:hover{color:var(--nw-accent)}
+
+/* ---------- Search filters (slides under the header when toggled) ---------- */
+#filters{display:flex;flex-wrap:wrap;gap:10px;padding:14px clamp(16px,4vw,40px);
+  background:#fff;border-bottom:1px solid #E4E2DA;box-shadow:0 8px 20px rgba(12,36,48,.08)}
+#filters[hidden]{display:none}
+#filters input,#filters select{flex:1 1 160px;min-width:0;padding:10px 12px;font:inherit;font-size:14px;
+  color:#1B2A2E;background:#FBFAF7;border:1px solid #D9D6CC;border-radius:10px}
+#filters input:focus,#filters select:focus{outline:none;border-color:var(--nw-accent);box-shadow:0 0 0 3px rgba(242,184,75,.3)}
+
+#message:empty{display:none}
+
+/* ---------- Smaller screens ---------- */
+@media (max-width:1000px){ .nw-tagline{display:none} }
+@media (max-width:640px){
+  .sticky-top .nw-header{flex-wrap:wrap;padding:10px 16px}
+  .nw-brand{order:1;flex:1;font-size:19px}
+  .nw-header #account{order:2;margin-left:0}
+  .nw-actions{order:3;width:100%;margin:0;justify-content:center}
+}
