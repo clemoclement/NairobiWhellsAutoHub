@@ -14,6 +14,19 @@ const $ = (selector) => document.querySelector(selector);
 const carName = (car) => escapeHtml(`${car.year} ${car.make} ${car.model}`);
 const isUnpaid = (order) => ['pending', 'confirmed'].includes(order.status);
 
+// ---- Show / hide the search tools in the hero ----
+const searchToggle = $('#search-toggle');
+const filtersPanel = $('#filters');
+
+searchToggle.addEventListener('click', () => {
+  const opening = filtersPanel.hidden;
+  filtersPanel.hidden = !opening;
+  searchToggle.setAttribute('aria-expanded', String(opening));
+  searchToggle.textContent = opening ? '✕ Close search' : '🔍 Search cars';
+  if (opening) $('#search').focus();
+});
+
+
 function showMessage(text) {
   const box = $('#message');
   box.textContent = text;
