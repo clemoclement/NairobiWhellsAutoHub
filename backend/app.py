@@ -11,6 +11,7 @@ from pathlib import Path
 from flask import Flask, jsonify, request, send_from_directory, session
 from werkzeug.security import check_password_hash
 
+from flask_cors import CORS
 import db
 import services
 from db import get_db, transaction
@@ -37,6 +38,7 @@ def create_app(test_config=None):
         MPESA_PUBLIC_URL=os.environ.get("MPESA_PUBLIC_URL", ""),  # e.g. your ngrok https address
         MPESA_CALLBACK_SECRET=os.environ.get("MPESA_CALLBACK_SECRET", "dev-callback-secret"),
     )
+    CORS(app, origins=[os.environ.get("FRONTEND_ORIGIN", "https://clemoclement.github.io")])
     if test_config:
         app.config.update(test_config)
     app.mpesa = MpesaClient(app.config)
