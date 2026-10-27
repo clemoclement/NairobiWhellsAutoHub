@@ -9,17 +9,19 @@ export class ApiError extends Error {
   }
 }
 
+const API_BASE = 'https://nairobiwheelsautohub.onrender.com';
+
 const SERVER_HELP =
-  'Cannot reach the AutoHub server. Start it with "flask --app app run" and open http://localhost:5000';
+  'Cannot reach the AutoHub server. It may be waking up, so please wait a minute and refresh the page.';
 
 export async function api(path, { method = 'GET', body } = {}) {
   let response;
   try {
-    response = await fetch('/api' + path, {
+   response = await fetch(API_BASE + '/api' + path, {
       method,
       headers: body ? { 'Content-Type': 'application/json' } : {},
       body: body ? JSON.stringify(body) : undefined,
-      credentials: 'same-origin', // sends the login cookie
+      credentials: 'include', // sends the login cookie across sites
     });
   } catch {
     throw new ApiError(SERVER_HELP, 0);

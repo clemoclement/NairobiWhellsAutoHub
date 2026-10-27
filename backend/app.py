@@ -29,7 +29,8 @@ def create_app(test_config=None):
         SECRET_KEY=os.environ.get("SECRET_KEY", "dev-only-change-me"),
         DATABASE=str(BASE / "autohub.db"),
         SESSION_COOKIE_HTTPONLY=True,   # JavaScript cannot read the cookie
-        SESSION_COOKIE_SAMESITE="Lax",  # other sites cannot send it along with requests
+        SESSION_COOKIE_SAMESITE="None",  # other sites cannot send it along with requests
+        SESSION_COOKIE_SECURE=True,
         MPESA_MODE=os.environ.get("MPESA_MODE", "mock"),  # mock, sandbox or production
         MPESA_CONSUMER_KEY=os.environ.get("MPESA_CONSUMER_KEY", ""),
         MPESA_CONSUMER_SECRET=os.environ.get("MPESA_CONSUMER_SECRET", ""),
@@ -38,7 +39,7 @@ def create_app(test_config=None):
         MPESA_PUBLIC_URL=os.environ.get("MPESA_PUBLIC_URL", ""),  # e.g. your ngrok https address
         MPESA_CALLBACK_SECRET=os.environ.get("MPESA_CALLBACK_SECRET", "dev-callback-secret"),
     )
-    CORS(app, origins=[os.environ.get("FRONTEND_ORIGIN", "https://clemoclement.github.io")])
+    CORS(app, origins=[os.environ.get("FRONTEND_ORIGIN", "https://clemoclement.github.io")], supports_credentials=True)
     if test_config:
         app.config.update(test_config)
     app.mpesa = MpesaClient(app.config)
